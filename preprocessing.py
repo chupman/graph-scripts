@@ -35,12 +35,12 @@ with open('data.csv', 'r') as input_file, open('profiles.csv', 'w') as profiles,
             line = re.sub(cleanup_regex, "", line).split(",")
 
             # Don't write header line
-            profiles.write(",".join(line[:7]) + "\n")
+            profiles.write(",".join(line[:8]) + "\n")
 
             # Write edges files line from remaining data, already includes newline
             edges.write(line[0] + "," + ",".join(line[7:]))
 
-            for friend in line[7:]:
+            for friend in line[8:]:
                 if friend and (not friend.isspace()):
                     friend_ids.add(friend)
 

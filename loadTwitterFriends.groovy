@@ -15,36 +15,6 @@ FILENAME = args[0];
 PROPERTIES = args[1];
 // Open or create graph database
 graph = JanusGraphFactory.open(PROPERTIES)
-
-// Create graph schema and indexes, if they haven't already been created
-mgmt = graph.openManagement();
-// If the id property key is not set then create the schema. This lets us reuse this import script for additonal data files.
-if (mgmt.getPropertyKey('id').equals(null)) {
-    userId = mgmt.makePropertyKey('id').dataType(Long.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
-    userName = mgmt.makePropertyKey('screenName').dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
-    mgmt.makePropertyKey('tags').dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SET).make();
-    mgmt.makePropertyKey('avatar').dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
-    mgmt.makePropertyKey('followersCount').dataType(Integer.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
-    mgmt.makePropertyKey('friendsCount').dataType(Integer.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
-    mgmt.makePropertyKey('lang').dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
-    mgmt.makePropertyKey('lastSeen').dataType(Date.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
-    mgmt.makePropertyKey('tweetId').dataType(Long.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
-    mgmt.makeEdgeLabel('follows').multiplicity(MULTI).make();
-//    mgmt.buildIndex('byScreenName', Vertex.class).addKey(userName).buildCompositeIndex();
-    mgmt.buildIndex('byId', Vertex.class).addKey(userId).buildCompositeIndex();
-    println 'created schema';
-    mgmt.commit();
-//    println 'Waiting for byScreenName Index to initialize';
-//    ManagementSystem.awaitGraphIndexStatus(graph, 'byScreenName').call()
-    println 'Waiting for byId Index to initialize';
-    ManagementSystem.awaitGraphIndexStatus(graph, 'byId').call()
-    println 'Indexes have been initialized';
-}  else { 
-    println 'Schema already exists';
-    mgmt.close();
-}
-
-
 // load the data
 g = graph.traversal();
 g.tx().rollback();
