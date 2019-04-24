@@ -38,14 +38,17 @@ with open('data.csv', 'r') as input_file, open('profiles.csv', 'w') as profiles,
             profiles.write(",".join(line[:8]) + "\n")
 
             # Write edges files line from remaining data, already includes newline
-            edges.write(line[0] + "," + ",".join(line[7:]))
+            edges.write(line[0] + "," + ",".join(line[8:]))
 
             for friend in line[8:]:
                 if friend and (not friend.isspace()):
                     friend_ids.add(friend)
 
 with open('friends.csv', 'w') as friends_f:
-    friends_f.write("\n".join(list(friend_ids.difference(profile_ids))) + "\n")
+    # Create a list from the difference of the 2 sets
+    friends = list(friend_ids.difference(profile_ids))
+    # After filtering out empty elements write out each friend id on a separate line
+    friends_f.write("\n".join(x.strip() for x in friends if x.strip()) + "\n")
 
 with open('hashtags.csv', 'w') as hashtags_f:
     for hashtag, users in iteritems(hashtags):

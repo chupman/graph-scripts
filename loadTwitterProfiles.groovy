@@ -28,12 +28,12 @@ field_name = ["id", "screenName", "avatar", "followersCount", "friendsCount", "l
 // Open file, iterate through each line, and set a the line number to count
 new File(FILENAME).eachLine { line, count ->
         String[] field = line.split(",");
-
+        Date date= new Date(Long.parseLong(field[6]));
         // Get or Create user Vertex
         //t_v1 = g.V().has('id', field[0]); v1 = t_v1.hasNext() ? t_v1.next() : graph.addVertex('id', field[0]);
         g.addV().property('id', field[0]).property('screenName', field[1]).property('avatar', field[2]).
                  property('followersCount', field[3]).property('friendsCount', field[4]).property('lang', field[5]).
-                 property('lastSeen', field[6]).property('tweetId', field[7])
+                 property('lastSeen', date).property('tweetId', field[7]).iterate();
         if (count % batchSize == 0) {
             graph.tx().commit();
             println "Commit complete. Vertex added count is at " + (count);

@@ -22,19 +22,17 @@ batchSize = 100000;
 lastBatch = 0;
 
 println 'Reading in file ' + FILENAME;
-    
-field_name = ["tag", "screenName", "avatar", "followersCount", "friendsCount", "lang", "lastSeen", "tweetId"]
-//edges_fields = ["id","...followers"]
 
 // Open file, iterate through each line, and set a the line number to count
 new File(FILENAME).eachLine { line, count ->
-        String[] field = line.split(",");
-
-        tag = g.addV().property('tag', field[0])
-        for (id in field) {
-            if (id == field[0]) continue;
-            user = g.V().has('id', id)
-            tag.addE("tagged").from(user)
+        // String[] fields = line.split(",");
+        LinkedList fields = line.split(",")
+        tagName = fields.get(0)
+        fields.remove(0)
+        tag = g.addV().property('tag', fields[0]).next()
+        for (id in fields) {
+            user = g.V().has('id', id).next();
+            edge = g.V(user).addE("tagged").to(tag).next()
         }
 
         if (count % batchSize == 0 || (count - lastBatch) > batchSize) {

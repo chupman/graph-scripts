@@ -12,15 +12,16 @@ graph = JanusGraphFactory.open(PROPERTIES)
 mgmt = graph.openManagement();
 // If the id property key is not set then create the schema. This lets us reuse this import script for additonal data files.
 if (mgmt.getPropertyKey('id').equals(null)) {
-    println 'Enabling bulk loading configuration options';
-    mgmt.set('schema.default', 'none');
-    mgmt.set('storage.batch-loading', true);
-    mgmt.set('ids.block-size', 500000);
-    println 'Bulk loading configuration options have been set, creating schema.';
+    // Add these to the property file
+    // println 'Enabling bulk loading configuration options';
+    // mgmt.set('schema.default', 'none');
+    // mgmt.set('storage.batch-loading', true);
+    // mgmt.set('ids.block-size', 500000);
+    // println 'Bulk loading configuration options have been set, creating schema.';
 
     userId = mgmt.makePropertyKey('id').dataType(Long.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
     userName = mgmt.makePropertyKey('screenName').dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
-    mgmt.makePropertyKey('tag').dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SET).make();
+    tag = mgmt.makePropertyKey('tag').dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SET).make();
     mgmt.makePropertyKey('avatar').dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
     mgmt.makePropertyKey('followersCount').dataType(Integer.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
     mgmt.makePropertyKey('friendsCount').dataType(Integer.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
@@ -29,13 +30,19 @@ if (mgmt.getPropertyKey('id').equals(null)) {
     mgmt.makePropertyKey('tweetId').dataType(Long.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
     mgmt.makeEdgeLabel('follows').multiplicity(MULTI).make();
     mgmt.makeEdgeLabel('tagged').multiplicity(MULTI).make();
-//    mgmt.buildIndex('byScreenName', Vertex.class).addKey(userName).buildCompositeIndex();
+    mgmt.makeVertexLabel('friend').make();
+    mgmt.makeVertexLabel('profile').make();
+
+    mgmt.buildIndex('byScreenName', Vertex.class).addKey(userName).buildCompositeIndex();
     mgmt.buildIndex('byId', Vertex.class).addKey(userId).buildCompositeIndex();
+    mgmt.buildIndex('byTag', Vertex.class).addKey(tag).buildCompositeIndex();
     println 'created schema';
     
     mgmt.commit();
-//    println 'Waiting for byScreenName Index to initialize';
-//    ManagementSystem.awaitGraphIndexStatus(graph, 'byScreenName').call()
+    println 'Waiting for byScreenName Index to initialize';
+    ManagementSystem.awaitGraphIndexStatus(graph, 'byScreenName').call()
+    println 'Waiting for byTag Index to initialize';
+    ManagementSystem.awaitGraphIndexStatus(graph, 'byTag').call()
     println 'Waiting for byId Index to initialize';
     ManagementSystem.awaitGraphIndexStatus(graph, 'byId').call()
     println 'Indexes have been initialized';

@@ -1,9 +1,10 @@
 #!/bin/bash
-# run all scripts
+# run all scripts should be run from the root of the janusgraph folder
 GRAPH_SCRIPTS=~/github/graph-scripts
 PROPERTIES=conf/janusgraph-cassandra-es.properties
 
-./bin/gremlin.sh -e ${GRAPH_SCRIPTS}/createTwitterFriendsSchema.groovy conf/janusgraph-cassandra-es.properties
+echo "Creating Schema"
+./bin/gremlin.sh -e ${GRAPH_SCRIPTS}/createTwitterFriendsSchema.groovy ${PROPERTIES}
 echo "Starting preprocessing"
 python ${GRAPH_SCRIPTS}/preprocessing.py
 echo "preprocessing complete"

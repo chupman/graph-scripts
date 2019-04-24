@@ -17,33 +17,33 @@ graph = JanusGraphFactory.open(PROPERTIES)
 // load the data
 g = graph.traversal();
 g.tx().rollback();
-batchSize = 100000;
+batchSize = 1000000;
 lastBatch = 0;
+edgeCount = 0;
 
 println 'Reading in file ' + FILENAME;
-    
-field_name = ["tag", "screenName", "avatar", "followersCount", "friendsCount", "lang", "lastSeen", "tweetId"]
-//edges_fields = ["id","...followers"]
 
 // Open file, iterate through each line, and set a the line number to count
 new File(FILENAME).eachLine { line, count ->
-        String[] field = line.split(",");
+    // println "sup";
+    LinkedList fields = line.split(",")
+    // userId = Long.valueOf(fields.pop())
+    userId = fields.get(0)
+    fields.removeFirst()
+    user = g.V().has('id', userId).next()
+    for (id in fields) {
+        friend = g.V().has('id', id).next()
+        edge = g.V(user).addE("follows").to(friend).next()
+        edgeCount++
+    }
 
-        user = g.V().has('id', field[0]);
-        for (id in field) {
-            if (id == field[0]) continue;
-            friend = g.V().has('id', id);
-            user.addE("follows").to(friend);
-        }
-
-        if (count % batchSize == 0 || (count - lastBatch) > batchSize) {
-            graph.tx().commit();
-            lastBatch = count;
-            println "Commit complete. Vertex added count is at " + (count);
-        }
-
+    // Check if we exceeded our batchSize and commit if so.
+    if ((edgeCount - lastBatch) >= batchSize) {
+        graph.tx().commit();
+        lastBatch = count + edgeCount;
+        println "Commit complete. Vertex added count is at " + (count) + " edgeCount is at " + edgeCount;
+    }
 }
-
 // Commit any remaining entries and close the graph
 graph.tx().commit();
 graph.close();
