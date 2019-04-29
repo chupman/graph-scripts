@@ -13,7 +13,7 @@ graph = JanusGraphFactory.open(PROPERTIES)
 // load the data
 g = graph.traversal();
 g.tx().rollback();
-batchSize = 1000000;
+batchSize = 100000;
 
 println 'Reading in file ' + FILENAME;
 
