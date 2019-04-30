@@ -11,7 +11,7 @@ echo "preprocessing complete"
 echo "loading users with profile information"
 ./bin/gremlin.sh -e ${GRAPH_SCRIPTS}/loadTwitterProfiles.groovy profiles.csv ${PROPERTIES}
 echo "loading friends without profile information"
-./bin/gremlin.sh -e ${GRAPH_SCRIPTS}/loadTwitterFriend.groovy friends.csv ${PROPERTIES}
+./bin/gremlin.sh -e ${GRAPH_SCRIPTS}/loadTwitterFriends.groovy friends.csv ${PROPERTIES}
 echo "loading hashtags and user edges"
 ./bin/gremlin.sh -e ${GRAPH_SCRIPTS}/loadTwitterHashTags.groovy hashtags.csv ${PROPERTIES}
 echo "creating follower edges"
